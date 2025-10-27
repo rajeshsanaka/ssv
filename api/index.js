@@ -7,38 +7,42 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ✅ MongoDB Connection (Use MongoDB Atlas URI)
-mongoose.connect("mongodb+srv://rajeshgroot_db_user:Rajesh1729@testprodb.9sqavom.mongodb.net/testprodb?retryWrites=true&w=majority")
+// ✅ MongoDB Connection
+mongoose.connect("mongodb+srv://rajeshgroot_db_user:Rajesh1729@testprodb.9sqavom.mongodb.net/?appName=testprodb")
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.log("❌ DB Error:", err));
+  .catch(err => console.error("❌ MongoDB Error:", err));
 
-// ✅ Define Schema and Model
+// ✅ Mongoose Schema & Model
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  email: { type: String, required: true },
+  password: { type: String, required: true },
 });
-
 const User = mongoose.model("User", userSchema);
 
-// ✅ Register API
-app.post("/api/register", async (req, res) => {
-  try {
-    const { username, password } = req.body;
+// ✅ Default route (for testing)
+app.get("/", (req, res) => {
+  res.json({ message: "Server is running ✅" });
+});
 
+// ✅ Register User
+app.post("/register", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ username, password: hashedPassword });
+    const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
 
     res.json({ success: true, message: "User registered successfully!" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
-// ✅ Login API
-app.post("/api/login", async (req, res) => {
+// ✅ Login User
+app.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
@@ -51,9 +55,9 @@ app.post("/api/login", async (req, res) => {
     res.json({ success: true, message: "Login successful!" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
-// ✅ Export for Vercel Serverless
+// ✅ Export app (no app.listen)
 export default app;
