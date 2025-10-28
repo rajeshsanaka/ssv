@@ -70,6 +70,7 @@ const CourseSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   course: { type: String, required: true, unique: true },
 });
+CourseSchema.index({ email: 1, course: 1 }, { unique: true });
 const Course = mongoose.model("Course", CourseSchema);
 app.post("/PostCourse", async (req, res) => {
   try {
