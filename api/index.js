@@ -1,4 +1,4 @@
-import express from "express";
+import express, { request } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import bcrypt from "bcryptjs";
@@ -8,9 +8,12 @@ app.use(express.json());
 app.use(cors());
 
 // ✅ MongoDB Connection
-mongoose.connect("mongodb+srv://rajeshgroot_db_user:Rajesh1729@testprodb.9sqavom.mongodb.net/?appName=testprodb")
+mongoose
+  .connect(
+    "mongodb+srv://rajeshgroot_db_user:Rajesh1729@testprodb.9sqavom.mongodb.net/?appName=testprodb"
+  )
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB Error:", err));
+  .catch((err) => console.error("❌ MongoDB Error:", err));
 
 // ✅ Mongoose Schema & Model
 const userSchema = new mongoose.Schema({
@@ -50,7 +53,8 @@ app.post("/login", async (req, res) => {
     if (!user) return res.json({ success: false, message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.json({ success: false, message: "Invalid password" });
+    if (!isMatch)
+      return res.json({ success: false, message: "Invalid password" });
 
     res.json({ success: true, message: "Login successful!" });
   } catch (err) {
@@ -60,4 +64,23 @@ app.post("/login", async (req, res) => {
 });
 
 // ✅ Export app (no app.listen)
+
+//courses
+const CourseSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  course: { type: String, required: true, unique: true },
+});
+const Course = mongoose.model("Course", CourseSchema);
+app.post("/PostCourse", async (req, res) => {
+  try {
+    const { email, course } = req.body;
+    const c = new Course({ email, course });
+    await c.save();
+    res.json({ success: true, message: "Course Uploaded" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 export default app;
