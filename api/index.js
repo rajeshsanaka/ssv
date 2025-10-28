@@ -85,6 +85,34 @@ app.post("/PostCourse", async (req, res) => {
 });
 
 
+
+
+//Admin
+
+//UploadAdmin
+const AdminUploadSchema= new mongoose.Schema({
+FirstName:{type:String, required:true},
+LastName:{type:String, required:true},
+DateOfBirth:{type:String , required:true},
+Email:{type:String, required:true, unique:true},
+PhoneNo:{type:String, required:true},
+Password:{type:String, required:true}
+
+})
+const AdminUploadModel=mongoose.model("adminupload", AdminUploadSchema);
+app.post("/UploadAdmin",async(req,res)=>{
+  // const {courseName}=req.body;
+  try{
+    const ucc=new AdminUploadModel(req.body);
+    await ucc.save();
+    res.status(200).json({success:true, message:"U[pload Succesfully"})
+
+  }catch(err){
+    res.status(500).json({success:false,message:err.message})
+  }
+})
+
+
 //Upload course
 
 const UploadCourseSchema=new mongoose.Schema({
@@ -102,5 +130,4 @@ app.post("/uploadCourse",async(req,res)=>{
     res.status(500).json({success:false,message:err.message})
   }
 })
-
 export default app;
