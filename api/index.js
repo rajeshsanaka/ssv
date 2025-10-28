@@ -87,20 +87,39 @@ app.post("/PostCourse", async (req, res) => {
 
 //Upload course
 
-const UploadCourse=new mongoose.Schema({
-  courseName:{type:String, required:true, unique:true }
-});
-const UC= mongoose.model("UC",UploadCourse);
-app.post("/uploadCourse",async(req,res)=>{
-  const {course}=req.body;
-  try{
-    const ucc=new UC({course});
-    await ucc.save();
-    res.status(200).json({success:true, message:"U[pload Succesfully"})
+const mongoose = require("mongoose");
 
-  }catch(err){
-    res.status(500).json({success:false,message:err.message})
+// Schema
+const UploadCourse = new mongoose.Schema({
+  courseName: { type: String, required: true, unique: true },
+});
+
+// Model
+const UC = mongoose.model("UC", UploadCourse);
+
+// Route
+app.post("/uploadCourse", async (req, res) => {
+  const { courseName } = req.body; // ✅ Must match schema key
+
+  try {
+    // Create new course
+    const newCourse = new UC({ courseName });
+    await newCourse.save();
+
+    res.status(200).json({ success: true, message: "Upload Successfully ✅" });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Course already exists!",
+      });
+    }
+
+    res
+      .status(500)
+      .json({ success: false, message: "Error uploading course: " + err.message });
   }
-})
+});
+
 
 export default app;
