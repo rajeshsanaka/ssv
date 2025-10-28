@@ -84,4 +84,23 @@ app.post("/PostCourse", async (req, res) => {
   }
 });
 
+
+//Upload course
+
+const UploadCourse=new mongoose.Schema({
+  courseName:{type:String, required:true, unique:true }
+});
+const UC= mongoose.model("UC",UploadCourse);
+app.post("/uploadCourse",async(req,res)=>{
+  const {course}=req.body;
+  try{
+    const ucc=new UC({course});
+    await ucc.save();
+    res.status(200).json({success:true, message:"U[pload Succesfully"})
+
+  }catch(err){
+    res.status(500).json({success:false,message:err.message})
+  }
+})
+
 export default app;
