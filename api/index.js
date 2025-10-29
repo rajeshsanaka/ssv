@@ -85,10 +85,10 @@ app.post("/PostCourse", async (req, res) => {
 });
 
 //getCourse
-app.get("/getCourse",async(req,res)=>{
+app.post("/getCourse",async(req,res)=>{
   try{
-    const {em}=req.body;
-   const course= await Course.find({email:em}) ;
+    const {email}=req.body;
+   const course= await Course.find({email:email}) ;
    res.status(200).json(course);
 
   }catch(err){
